@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { UserFormData, FormErrors } from "../types";
 import { validateForm } from "../utils/validation";
@@ -12,30 +12,33 @@ interface UserFormProps {
 
 export default function UserForm({ initialData }: UserFormProps) {
   const router = useRouter();
-  const [formData, setFormData] = useState<UserFormData>(
-    initialData || {
-      name: "",
-      email: "",
-      phone: "",
-      position: "",
-      description: "",
-    }
-  );
+  const [formData, setFormData] = useState<UserFormData>({
+    name: "",
+    email: "",
+    phone: "",
+    position: "",
+    description: "",
+  });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  // Update form data when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData((prev: UserFormData) => ({
       ...prev,
       [name]: value,
     }));
 
     // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({
+      setErrors((prev: FormErrors) => ({
         ...prev,
         [name]: undefined,
       }));
